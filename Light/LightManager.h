@@ -1,90 +1,91 @@
-#include "Light.h"
- 
+
+
+
 #ifndef LIGHTMANAGERH
 #define LIGHTMANAGERH
- 
+
 #include "Singleton.h"
- 
-//Le light manager est un singleton
+
+#include "Directional_light.h"
+
 class Light_Manager : public CSingleton<Light_Manager>
 {
     protected :
- 
+
     Light_Manager();
     ~Light_Manager();
- 
-     // Les tableaux de murs, lumi√®res statiques et dynamiques
+
+     // Les tableaux de murs, lumiËres statiques et dynamiques
     std::vector <Wall> m_wall;
-    std::vector <Light> m_StaticLight;
-    std::vector <Light> m_DynamicLight;
- 
+    std::vector <Light*> m_StaticLight;
+    std::vector <Light*> m_DynamicLight;
+
     public :
     // Constructeur et destructeur
     friend Light_Manager* CSingleton<Light_Manager>::GetInstance();
     friend void CSingleton<Light_Manager>::Kill();
- 
- 
-    //Diff√©rents moyen d'ajouter une lumi√®re dynamique, soit on l'ajoute sans aucune valeur par d√©faut, soit on lui donne une lumi√®re par d√©faut, soit on lui donne ses valeurs "√† la main"
+
+
+    //DiffÈrents moyen d'ajouter une lumiËre dynamique, soit on l'ajoute sans aucune valeur par dÈfaut, soit on lui donne une lumiËre par dÈfaut, soit on lui donne ses valeurs "‡ la main"
     Light_Entity Add_Dynamic_Light();
     Light_Entity Add_Dynamic_Light(Light);
     Light_Entity Add_Dynamic_Light(sf::Vector2f position, float intensity, float radius, int quality, sf::Color color);
- 
-    //Diff√©rents moyen d'ajouter une lumi√®re dynamique, soit on lui donne une lumi√®re par d√©faut, soit on lui donne ses valeurs "√† la main"
-    //On ne peut ajouter une lumi√®re static sans rien, √ßa ne servirait √† rien car elle ne peut √™tre modifi√©e par la suite
+
+    Light_Entity Add_Dynamic_Directional_Light();
+    Light_Entity Add_Dynamic_Directional_Light(Directional_light);
+    Light_Entity Add_Dynamic_Directional_Light(sf::Vector2f position, float intensity, float radius, float angle, float o_angle, sf::Color color);
+
     Light_Entity Add_Static_Light(Light);
     Light_Entity Add_Static_Light(sf::Vector2f position, float intensity, float radius, int quality, sf::Color color);
- 
+
+    Light_Entity Add_Static_Directional_Light(Directional_light);
+    Light_Entity Add_Static_Directional_Light(sf::Vector2f position, float intensity, float radius, float angle, float o_angle, sf::Color color);
+
     // Ajouter un mur
     Wall_Entity Add_Wall(sf::Vector2f pt1,sf::Vector2f pt2);
- 
-    // D√©sactiver une lumi√®re ou supprimer un mur
+
+    // DÈsactiver une lumiËre ou supprimer un mur
     void Delete_Light(Light_Entity);
     void Delete_Wall(Wall_Entity);
- 
-    // Vide les tableaux de lumi√®res et de murs
+
     void Delete_All_Wall();
     void Delete_All_Light();
- 
-    // Calculer toutes les lumi√®res dynamiques
+
+    // Calculer toutes les lumiËres dynamiques
     void Generate();
     void Generate(Light_Entity);
- 
-    // Afficher toutes les lumi√®res √† l'√©cran
+
+    // Afficher toutes les lumiËres ‡ l'Ècran
     void Draw(sf::RenderWindow *App);
- 
-    // Diff√©rentes m√©thodes pour modifier les attributs d'une lumi√®re, ou les r√©cup√©rer. Il faut √† chaque fois envoyer une Light_Entity en param√®tre pour
-    // savoir de quelle lumi√®re on parle/
- 
+
+    // DiffÈrentes mÈthodes pour modifier les attributs d'une lumiËre, ou les rÈcupÈrer. Il faut ‡ chaque fois envoyer une Light_Entity en paramËtre pour
+    // savoir de quelle lumiËre on parle/
+
     void SetPosition(Light_Entity, sf::Vector2f );
     void SetQuality(Light_Entity, int );
     void SetRadius(Light_Entity, int );
     void SetColor(Light_Entity, sf::Color );
     void SetIntensity(Light_Entity, int);
- 
+
+    void SetOtherParameter(Light_Entity , unsigned, float);
+
     float GetIntensity(Light_Entity);
     float GetRadius(Light_Entity);
     int GetQuality(Light_Entity);
     sf::Color GetColor(Light_Entity);
     sf::Vector2f GetPosition(Light_Entity);
- 
+
     void SetPosition(Wall_Entity, sf::Vector2f );
- 
-    //La lumi√®re de base de l'√©cran, efficace pour un cycle jour/nuit.
+
     sf::Color m_basicLight;
- 
-    // Le nombre d'it√©rations d'effet de flou.
     int m_lightSmooth;
- 
-    // Le sprite et l'image r√©sultante de l'affichage des lumi√®res
-    sf::Sprite *m_render;
-    sf::Image m_renderImg;
- 
+
     private:
-    // Le post effet pour donner un effet de flou aux lumi√®res
-    sf::PostFX BlurEffect;
- 
-    std::vector<Light>::iterator Iter;
+
+    sf::Shader BlurEffect;
+    std::vector<Light*>::iterator Iter;
+    sf::RenderImage m_renderImg;
+
 };
 #endif
-
 
